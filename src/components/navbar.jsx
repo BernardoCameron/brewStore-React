@@ -91,12 +91,12 @@ export default function Navbar() {
 
           {/* botones */}
           <div className="flex justify-center md:justify-start items-center space-x-3 mt-3 md:mt-0 md:ml-6">
-            <button className="bg-[var(--primario-amber)] text-[var(--texto-principal)] font-bold px-5 py-2 rounded-full hover:bg-[#e6ac00] transition-all">
+            <button className="bg-[var(--primario-amber)] text-[var(--secundario-malta)] font-bold px-5 py-2 rounded-full hover:bg-[#e6ac00] transition-all">
               Iniciar Sesión
             </button>
 
             <button className="bg-[var(--primario-amber)] p-2 rounded-full hover:bg-[#e6ac00] transition-all">
-              <ShoppingCart className="text-[var(--texto-principal)] w-5 h-5" />
+              <ShoppingCart className="text-[var(--secundario-malta)] w-5 h-5" />
             </button>
           </div>
         </div>

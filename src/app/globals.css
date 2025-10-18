@@ -199,3 +199,19 @@ body {
   border-color: var(--primario-amber);
   box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
 }
+
+.footer-custom a {
+  color: var(--texto-principal) !important;
+}
+
+.footer-custom a:hover {
+  color: var(--primario-amber) !important;
+}
+
+.footer-custom svg {
+  color: var(--texto-principal) !important;
+}
+
+.footer-custom svg:hover {
+  color: var(--primario-amber) !important;
+}
