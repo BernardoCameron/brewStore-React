@@ -20,12 +20,12 @@
 }
 
 /* dark theme */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --bg-principal: #0a0a0a;
     --texto-principal: #ededed;
   }
-}
+} */
 
 /* globales */
 body {
@@ -64,7 +64,7 @@ body {
 }
 
 .hero-section {
-  background: linear-gradient(rgba(108, 88, 76, 0.7), rgba(108, 88, 76, 0.7)), url('/assets/img/hero-img.jpg');
+  background: linear-gradient(rgba(108, 88, 76, 0.7), rgba(108, 88, 76, 0.7)), url('/hero-img.jpg');
   background-size: cover;
   background-position: center;
   min-height: 70vh;
@@ -201,7 +201,7 @@ body {
 }
 
 .footer-custom a {
-  color: var(--texto-principal) !important;
+  color: var(--bg-principal) !important;
 }
 
 .footer-custom a:hover {
@@ -209,7 +209,7 @@ body {
 }
 
 .footer-custom svg {
-  color: var(--texto-principal) !important;
+  color: var(--bg-principal) !important;
 }
 
 .footer-custom svg:hover {
