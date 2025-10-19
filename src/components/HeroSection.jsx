@@ -8,7 +8,7 @@ export default function HeroSection() {
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-2/3 hero-content text-[var(--blanco-puro)]">
-            <h1 className="text-5xl font-bold mb-4">Brewstore</h1>
+            <h1 >Brewstore</h1>
             <p className="text-lg mb-6">
               Cerveza artesanal de la más alta calidad, elaborada con pasión y
               tradición desde 2015

@@ -1,5 +1,5 @@
 "use client";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, Beer } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 py-12">
           <div>
             <h5 className="text-[var(--blanco-puro)] font-bold mb-3 flex items-center gap-2">
-              <span role="img" aria-label="beer">🍺</span> Brewstore
+              <Beer /> Brewstore
             </h5>
             <p className="text-[var(--bg-principal)] mb-4">
               Cerveza artesanal de calidad premium, elaborada con pasión y tradición desde 2015.
