@@ -7,22 +7,39 @@ export default function ProductosSection() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     async function fetchProductos() {
-        const { data, error } = await supabase
-        .from("producto")
-        .select("*")
-        .eq("destacado", true)
-        .order("id", { ascending: true });
+      setLoading(true);
 
-        console.log("DATA:", data);
-        console.log("ERROR:", error);
+    const { data, error } = await supabase
+      .from("producto")
+      .select("*")
+      .eq("destacado", true)
+      .order("id", { ascending: true })
+      .limit(8);
+      console.log("DATA:", data);
+      console.log("ERROR:", error);
+
+      if (error) {
+        console.error("Error al obtener productos:", error);
+      } else {
+        setProductos(data || []);
+      }
+
+      setLoading(false);
     }
 
     fetchProductos();
-    }, []);
-  console.log(productos);
-  
+  }, []);
+
+  function formatCurrency(value) {
+    if (!value) return "$0";
+    return value.toLocaleString("es-CL", {
+      style: "currency",
+      currency: "CLP",
+      minimumFractionDigits: 0,
+    });
+  }
 
   if (loading) {
     return (
@@ -47,7 +64,7 @@ export default function ProductosSection() {
             >
               <div>
                 <Image
-                  src={prod.imagen && prod.imagen.trim() !== "" ? prod.imagen : "/assets/img/producto-generica.png"}
+                  src={prod.imagen}
                   alt={prod.nombre}
                   width={400}
                   height={300}
@@ -57,7 +74,7 @@ export default function ProductosSection() {
                 <p className="card-text text-sm mb-3">{prod.descripcion}</p>
               </div>
               <div>
-                <span className="price block mb-2">{prod.precio} CLP</span>
+                <span className="price block mb-2">{formatCurrency(prod.precio)} CLP</span>
                 <button className="btn-primary-custom text-sm px-6 py-2">
                   Añadir al carrito
                 </button>
