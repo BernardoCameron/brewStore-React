@@ -5,7 +5,6 @@ export default function StatsSection() {
     <section className="stats-section section-padding">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 text-center gap-8">
-
           <div>
             <div className="stat-number">15+</div>
             <p className="text-[var(--blanco-puro)]">Variedades de Cerveza</p>

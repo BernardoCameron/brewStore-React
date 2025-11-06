@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
+import { useCart } from "@/context/CartContext";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -14,12 +15,16 @@ export default function ProductosPage() {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const [loading, setLoading] = useState(false);
+  const { addToCart } = useCart();
 
-// paginador
+  // cantidades manejadas por id
+  const [cantidades, setCantidades] = useState({});
+
+  // paginador
   const [paginaActual, setPaginaActual] = useState(1);
   const productosPorPagina = 6;
 
-//   get producto y categoria
+  // obtener productos
   useEffect(() => {
     async function fetchProductos() {
       setLoading(true);
@@ -36,6 +41,11 @@ export default function ProductosPage() {
         console.error("Error al obtener productos:", error);
       } else {
         setProductos(data || []);
+
+        // inicializamos las cantidades en 1
+        const inicial = {};
+        data?.forEach((p) => (inicial[p.id] = 1));
+        setCantidades(inicial);
       }
 
       setLoading(false);
@@ -45,6 +55,7 @@ export default function ProductosPage() {
     fetchProductos();
   }, [categoriaSeleccionada]);
 
+  // obtener categorías
   useEffect(() => {
     async function fetchCategorias() {
       const { data, error } = await supabase
@@ -62,7 +73,7 @@ export default function ProductosPage() {
     fetchCategorias();
   }, []);
 
-//   paginador
+  // paginación
   const indiceInicio = (paginaActual - 1) * productosPorPagina;
   const indiceFin = indiceInicio + productosPorPagina;
   const productosPaginados = productos.slice(indiceInicio, indiceFin);
@@ -75,19 +86,22 @@ export default function ProductosPage() {
     }
   }
 
+  // actualizar cantidad por id
+  const cambiarCantidad = (id, valor) => {
+    setCantidades((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + valor),
+    }));
+  };
+
   return (
-    <main
-      className="py-16 px-4 md:px-8"
-      style={{ backgroundColor: "var(--bg-principal)" }}
-    >
+    <main className="py-16 px-4 md:px-8" style={{ backgroundColor: "var(--bg-principal)" }}>
       <div className="container mx-auto max-w-6xl">
-        <h2
-          className="section-title text-center mb-2"
-          style={{ color: "var(--secundario-malta)" }}
-        >
+        <h2 className="section-title text-center mb-2" style={{ color: "var(--secundario-malta)" }}>
           Nuestros Productos
         </h2>
 
+        {/* Filtro de categorías */}
         <div className="flex justify-center mb-8">
           <select
             id="categoriaFiltro"
@@ -105,16 +119,15 @@ export default function ProductosPage() {
             }}
           >
             <option value="">Todas las categorías</option>
-            {categorias &&
-              categorias.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>
                 {cat.nombre}
-                </option>
-              ))}
+              </option>
+            ))}
           </select>
         </div>
 
-        {/* cards productos */}
+        {/* Cards de productos */}
         {loading ? (
           <p className="text-center" style={{ color: "var(--texto-secundario)" }}>
             Cargando productos...
@@ -145,16 +158,10 @@ export default function ProductosPage() {
                   >
                     {producto.nombre}
                   </h5>
-                  <p
-                    className="text-sm mb-2"
-                    style={{ color: "var(--texto-secundario)" }}
-                  >
+                  <p className="text-sm mb-2" style={{ color: "var(--texto-secundario)" }}>
                     {producto.descripcion}
                   </p>
-                  <p
-                    className="font-bold mb-3"
-                    style={{ color: "var(--acento-lupulo)" }}
-                  >
+                  <p className="font-bold mb-3" style={{ color: "var(--acento-lupulo)" }}>
                     {producto.precio?.toLocaleString("es-CL")} CLP
                   </p>
                 </div>
@@ -169,29 +176,30 @@ export default function ProductosPage() {
                   </a>
 
                   <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      defaultValue="1"
-                      className="w-14 border rounded-md text-center"
-                      style={{
-                        borderColor: "rgba(0,0,0,0.2)",
-                        color: "var(--texto-principal)",
-                      }}
-                    />
+                    <div className="flex items-center border rounded-md overflow-hidden">
+                      <button
+                        onClick={() => cambiarCantidad(producto.id, -1)}
+                        className="px-2 font-bold"
+                        style={{ color: "var(--secundario-malta)" }}
+                      >
+                        −
+                      </button>
+                      <span className="px-3 select-none">{cantidades[producto.id] || 1}</span>
+                      <button
+                        onClick={() => cambiarCantidad(producto.id, 1)}
+                        className="px-2 font-bold"
+                        style={{ color: "var(--secundario-malta)" }}
+                      >
+                        +
+                      </button>
+                    </div>
+
                     <button
-                      className="flex items-center justify-center rounded-full"
-                      style={{
-                        backgroundColor: "var(--primario-amber)",
-                        width: "40px",
-                        height: "40px",
-                        color: "var(--texto-principal)",
-                        fontWeight: "bold",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
-                      }}
-                      title="Agregar al carrito"
+                      onClick={() => addToCart(producto, cantidades[producto.id] || 1)}
+                      className="btn-primary-custom text-sm px-4 py-2 rounded-full font-semibold"
+                      title="Añadir al carrito"
                     >
-                      +
+                      🛒 Añadir
                     </button>
                   </div>
                 </div>
@@ -204,7 +212,7 @@ export default function ProductosPage() {
           </p>
         )}
 
-        {/* render paginador */}
+        {/* Paginador */}
         {totalPaginas > 1 && (
           <div className="flex justify-center mt-10 gap-2">
             <button

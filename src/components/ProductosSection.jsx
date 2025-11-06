@@ -2,46 +2,51 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import supabase from "@/lib/supabaseClient";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductosSection() {
   const [productos, setProductos] = useState([]);
+  const [cantidades, setCantidades] = useState({});
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProductos() {
       setLoading(true);
+      const { data, error } = await supabase
+        .from("producto")
+        .select("*")
+        .eq("destacado", true)
+        .order("id", { ascending: true })
+        .limit(8);
 
-    const { data, error } = await supabase
-      .from("producto")
-      .select("*")
-      .eq("destacado", true)
-      .order("id", { ascending: true })
-      .limit(8);
-      console.log("DATA:", data);
-      console.log("ERROR:", error);
-
-      if (error) {
-        console.error("Error al obtener productos:", error);
-      } else {
+      if (error) console.error("Error al obtener productos:", error);
+      else {
         setProductos(data || []);
+        const inicial = {};
+        data?.forEach((p) => (inicial[p.id] = 1));
+        setCantidades(inicial);
       }
-
       setLoading(false);
     }
-
     fetchProductos();
   }, []);
 
-  function formatCurrency(value) {
-    if (!value) return "$0";
-    return value.toLocaleString("es-CL", {
+  const formatCurrency = (value) =>
+    value?.toLocaleString("es-CL", {
       style: "currency",
       currency: "CLP",
       minimumFractionDigits: 0,
-    });
-  }
+    }) ?? "$0";
 
-  if (loading) {
+  const cambiarCantidad = (id, valor) => {
+    setCantidades((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + valor),
+    }));
+  };
+
+  if (loading)
     return (
       <section id="productos" className="section-padding">
         <div className="container mx-auto text-center py-10">
@@ -49,7 +54,6 @@ export default function ProductosSection() {
         </div>
       </section>
     );
-  }
 
   return (
     <section id="productos" className="section-padding">
@@ -64,7 +68,7 @@ export default function ProductosSection() {
             >
               <div>
                 <Image
-                  src={prod.imagen}
+                  src={prod.imagen || "/ipa-dorada.png"}
                   alt={prod.nombre}
                   width={400}
                   height={300}
@@ -73,11 +77,48 @@ export default function ProductosSection() {
                 <h3 className="card-title text-lg mb-2">{prod.nombre}</h3>
                 <p className="card-text text-sm mb-3">{prod.descripcion}</p>
               </div>
-              <div>
-                <span className="price block mb-2">{formatCurrency(prod.precio)} CLP</span>
-                <button className="btn-primary-custom text-sm px-6 py-2">
-                  Añadir al carrito
-                </button>
+
+              <div className="flex flex-col items-center gap-3">
+                <span className="price block font-semibold">{formatCurrency(prod.precio)}</span>
+
+                <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center border rounded-md overflow-hidden">
+                    <button
+                      onClick={() => cambiarCantidad(prod.id, -1)}
+                      className="px-2 font-bold"
+                      style={{ color: "var(--secundario-malta)" }}
+                    >
+                      −
+                    </button>
+                    <span className="px-3 select-none">{cantidades[prod.id] || 1}</span>
+                    <button
+                      onClick={() => cambiarCantidad(prod.id, 1)}
+                      className="px-2 font-bold"
+                      style={{ color: "var(--secundario-malta)" }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      addToCart(
+                        {
+                          id: prod.id,
+                          nombre: prod.nombre,
+                          imagen: prod.imagen || "/ipa-dorada.png",
+                          precio: Number(prod.precio) || 0,
+                          descripcion: prod.descripcion || "",
+                        },
+                        cantidades[prod.id] || 1
+                      )
+                    }
+                    className="btn-primary-custom text-sm px-4 py-2 rounded-full font-semibold"
+                    title="Añadir al carrito"
+                  >
+                    Añadir
+                  </button>
+                </div>
               </div>
             </div>
           ))}
