@@ -1,8 +1,41 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import supabase from "../../lib/supabaseClient"; // Asegúrate de que la ruta sea correcta
 
 export default function RegisterPage() {
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const username = e.target.username.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username }, // guarda el nombre en user_metadata
+      },
+    });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      setSuccessMsg("✅ Registro exitoso. Revisa tu correo para confirmar la cuenta.");
+      console.log("Nuevo usuario:", data);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <main
       className="flex flex-col justify-center items-center"
@@ -26,13 +59,9 @@ export default function RegisterPage() {
           Crear Cuenta
         </h2>
 
-        <form id="registerForm" className="space-y-4">
+        <form id="registerForm" onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium mb-1"
-              style={{ color: "var(--texto-principal)" }}
-            >
+            <label htmlFor="username" className="block text-sm font-medium mb-1">
               Nombre de Usuario
             </label>
             <input
@@ -40,16 +69,11 @@ export default function RegisterPage() {
               id="username"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
-              style={{ borderColor: "rgba(0,0,0,0.15)" }}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium mb-1"
-              style={{ color: "var(--texto-principal)" }}
-            >
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Correo Electrónico
             </label>
             <input
@@ -57,16 +81,11 @@ export default function RegisterPage() {
               id="email"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
-              style={{ borderColor: "rgba(0,0,0,0.15)" }}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium mb-1"
-              style={{ color: "var(--texto-principal)" }}
-            >
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
               Contraseña
             </label>
             <input
@@ -74,12 +93,12 @@ export default function RegisterPage() {
               id="password"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
-              style={{ borderColor: "rgba(0,0,0,0.15)" }}
             />
           </div>
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-2 font-semibold rounded-full transition"
             style={{
               backgroundColor: "var(--primario-amber)",
@@ -87,9 +106,12 @@ export default function RegisterPage() {
               boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
             }}
           >
-            Registrarme
+            {loading ? "Registrando..." : "Registrarme"}
           </button>
         </form>
+
+        {errorMsg && <p className="mt-3 text-center text-red-600 text-sm">{errorMsg}</p>}
+        {successMsg && <p className="mt-3 text-center text-green-600 text-sm">{successMsg}</p>}
 
         <p className="mt-4 text-center text-sm">
           ¿Ya tienes cuenta?{" "}
