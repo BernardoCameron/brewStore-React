@@ -1,0 +1,5 @@
+require("@testing-library/jest-dom");
+
+process.env.NEXT_PUBLIC_SUPABASE_URL = "https://fwgkgdsylaawxbnxajwp.supabase.co";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3Z2tnZHN5bGFhd3hibnhhandwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3NzY0OTQsImV4cCI6MjA3NjM1MjQ5NH0.qjZOLRYCVtaPEgGxJIg16bQ2YpvJ17FXPeugj1ZYETE";

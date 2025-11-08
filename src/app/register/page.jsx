@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import supabase from "../../lib/supabaseClient"; // Asegúrate de que la ruta sea correcta
+import supabase from "../../lib/supabaseClient";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -22,15 +22,21 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { username }, // guarda el nombre en user_metadata
+        data: { username },
+        emailRedirectTo: null, // evita confirmación de correo
       },
     });
 
     if (error) {
       setErrorMsg(error.message);
     } else {
-      setSuccessMsg("✅ Registro exitoso. Revisa tu correo para confirmar la cuenta.");
+      await supabase.auth.signOut();
+
+      setSuccessMsg("Registro exitoso.");
       console.log("Nuevo usuario:", data);
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1200);
     }
 
     setLoading(false);
@@ -67,6 +73,7 @@ export default function RegisterPage() {
             <input
               type="text"
               id="username"
+              name="username"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
             />
@@ -79,6 +86,7 @@ export default function RegisterPage() {
             <input
               type="email"
               id="email"
+              name="email"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
             />
@@ -91,6 +99,7 @@ export default function RegisterPage() {
             <input
               type="password"
               id="password"
+              name="password"
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--acento-lupulo)]"
             />

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import supabase from "../../lib/supabaseClient"; // 👈 asegúrate de usar la versión default (como antes)
-
+import supabase from "../../lib/supabaseClient";
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -12,21 +11,16 @@ export default function LoginPage() {
     setLoading(true);
     setErrorMsg("");
 
-    const email = e.target.username.value; // 👈 este campo usa el correo electrónico
-    const password = e.target.password.value;
+    const formData = new FormData(e.target);
+    const email = formData.get("username");
+    const password = formData.get("password");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      console.error("Error al iniciar sesión:", error.message);
       setErrorMsg("Credenciales incorrectas o usuario no verificado.");
     } else {
-      console.log("Usuario logeado:", data.user);
-      // Redirige a la página principal o productos
-      window.location.href = "/"; // 👈 cámbialo si tienes otra ruta principal
+      window.location.href = "/";
     }
 
     setLoading(false);
@@ -104,9 +98,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {errorMsg && (
-          <p className="mt-3 text-center text-red-600 text-sm">{errorMsg}</p>
-        )}
+        {errorMsg && <p className="mt-3 text-center text-red-600 text-sm">{errorMsg}</p>}
 
         <div className="mt-4 text-center text-sm">
           ¿No tienes cuenta?{" "}
